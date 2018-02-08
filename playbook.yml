@@ -1,0 +1,25 @@
+---
+- hosts: ungrouped
+  become: yes
+  pre_tasks:
+    - block:
+      - apt: name=python-pip
+      - pip: name=ndg-httpsclient state=present
+      when:
+        - ansible_distribution == "Ubuntu"
+        - ansible_distribution_major_version == "14"
+  roles:
+    - role: ../{{ playbook_dir | basename }}
+      apt_repository_package_names:
+        - name: openjdk-8-jdk
+      apt_repository: 'ppa:openjdk-r/ppa'
+      apt_repository_key_id: 86F44E2A
+      apt_repository_keyserver: keyserver.ubuntu.com
+      when: ansible_distribution == "Ubuntu"
+
+    - role: ../{{ playbook_dir | basename }}
+      apt_repository_package_names:
+        - name: bazel
+          install_recommends: no
+      apt_repository: 'deb [arch=amd64] http://storage.googleapis.com/bazel-apt stable jdk1.8'
+      apt_repository_key_url: https://bazel.build/bazel-release.pub.gpg

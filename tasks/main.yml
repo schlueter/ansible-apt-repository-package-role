@@ -1,0 +1,15 @@
+---
+- name: Install the repository key
+  apt_key:
+    keyserver: "{{ apt_repository_keyserver if apt_repository_keyserver else omit }}"
+    id: "{{ apt_repository_key_id if apt_repository_key_id else omit }}"
+    url: "{{ apt_repository_key_url if apt_repository_key_url else omit }}"
+
+- name: Configure the apt repository
+  apt_repository: repo={{ apt_repository }}
+
+- name: Install packages from the ppa
+  apt:
+    package: "{{ item.name }}"
+    install_recommends: "{{ item.install_recommends | default(omit) }}"
+  with_items: "{{ apt_repository_package_names }}"
